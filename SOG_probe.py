@@ -13,16 +13,13 @@ st.set_page_config(page_title="Document Summarizer", page_icon="📄", layout="w
 @st.cache_resource
 def load_summarizer():
     try:
-        return pipeline("summarization", model="facebook/bart-large-cnn")
+        return pipeline(
+            "summarization", model="sshleifer/distilbart-cnn-12-6", device=0
+        )  # use GPU
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
         st.info("Try refreshing the page or contact the administrator.")
         return None
-
-
-""" def load_summarizer():
-    # return pipeline("summarization", model="sshleifer/distilbart-cnn-12-6", device=0) #use GPU
-    return pipeline("summarization", model="sshleifer/distilbart-cnn-12-6") """
 
 
 summarizer = load_summarizer()
