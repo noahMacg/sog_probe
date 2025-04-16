@@ -12,7 +12,8 @@ st.set_page_config(page_title="Document Summarizer", page_icon="📄", layout="w
 # Initialize summarizer
 @st.cache_resource
 def load_summarizer():
-    return pipeline("summarization", model="sshleifer/distilbart-cnn-12-6", device=0)
+    # return pipeline("summarization", model="sshleifer/distilbart-cnn-12-6", device=0) #use GPU
+    return pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
 
 
 summarizer = load_summarizer()
@@ -48,6 +49,7 @@ def summarize_text(text, max_chunk_length=1024):
     return "\n\n".join(summaries)
 
 
+#
 def search_in_text(text, search_term):
     if not search_term or not text:
         return text
