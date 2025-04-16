@@ -4,6 +4,12 @@ import tempfile
 from transformers import pipeline
 from docx import Document
 import torch
+import sys
+
+# Prevent Streamlit from watching torch._classes
+# This addresses the error with torch.classes.__path__._path
+if "torch._classes" in sys.modules:
+    sys.modules["torch._classes"].__path__ = []
 
 # Set page configuration
 st.set_page_config(page_title="Document Summarizer", page_icon="📄", layout="wide")
@@ -122,17 +128,17 @@ if uploaded_file:
     with tab2:
         st.subheader("Summary")
         if st.button("Generate Summary"):
-            summary = summarize_text(text)
+            with st.spinner("Generating summary... This may take a moment."):
+                summary = summarize_text(text)
+                st.text_area("", summary, height=400)
 
-            st.text_area("", summary, height=400)
-
-            # Download option
-            st.download_button(
-                label="Download Summary",
-                data=summary,
-                file_name=f"{uploaded_file.name.split('.')[0]}_summary.txt",
-                mime="text/plain",
-            )
+                # Download option
+                st.download_button(
+                    label="Download Summary",
+                    data=summary,
+                    file_name=f"{uploaded_file.name.split('.')[0]}_summary.txt",
+                    mime="text/plain",
+                )
 
     # Clean up temp file
     os.unlink(docx_path)
