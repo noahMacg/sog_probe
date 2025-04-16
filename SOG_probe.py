@@ -13,8 +13,9 @@ st.set_page_config(page_title="Document Summarizer", page_icon="📄", layout="w
 @st.cache_resource
 def load_summarizer():
     try:
+        device = 0 if torch.cuda.is_available() else -1
         return pipeline(
-            "summarization", model="sshleifer/distilbart-cnn-12-6", device=0
+            "summarization", model="sshleifer/distilbart-cnn-12-6", device=device
         )  # use GPU
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
