@@ -7,7 +7,6 @@ import torch
 import sys
 
 # Prevent Streamlit from watching torch._classes
-# This addresses the error with torch.classes.__path__._path
 if "torch._classes" in sys.modules:
     sys.modules["torch._classes"].__path__ = []
 
