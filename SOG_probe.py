@@ -12,9 +12,12 @@ st.set_page_config(page_title="Document Summarizer", page_icon="📄", layout="w
 # Initialize summarizer
 @st.cache_resource
 def load_summarizer():
-    return pipeline(
-        "summarization", model="facebook/bart-large-cnn"
-    )  # Alternative model
+    try:
+        return pipeline("summarization", model="facebook/bart-large-cnn")
+    except Exception as e:
+        st.error(f"Error loading model: {str(e)}")
+        st.info("Try refreshing the page or contact the administrator.")
+        return None
 
 
 """ def load_summarizer():
