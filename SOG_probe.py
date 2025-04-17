@@ -1,3 +1,10 @@
+# MacGillivray Final project
+# Programmer: Noah MacGillivray
+# EMail: nmacgillivray@cnm.edu
+# Purpose: Reads in a .docx file and has the option to summarize.
+# Uses Streamlit as a GUI and ability to share.
+# Sources: Streamlit.com and multiple chats with ChatGPT & Claude.
+
 import streamlit as st
 import os
 import tempfile
@@ -7,6 +14,7 @@ import torch
 import sys
 
 # Prevent Streamlit from watching torch._classes
+# Was running into problems integrating w/ Streamlit
 if "torch._classes" in sys.modules:
     sys.modules["torch._classes"].__path__ = []
 
@@ -18,10 +26,11 @@ st.set_page_config(page_title="Document Summarizer", page_icon="📄", layout="w
 @st.cache_resource
 def load_summarizer():
     try:
+        # If GPU is available use it; otherwise use CPU
         device = 0 if torch.cuda.is_available() else -1
         return pipeline(
             "summarization", model="sshleifer/distilbart-cnn-12-6", device=device
-        )  # use GPU
+        )
     except Exception as e:
         st.error(f"Error loading model: {str(e)}")
         st.info("Try refreshing the page or contact the administrator.")
@@ -31,7 +40,8 @@ def load_summarizer():
 summarizer = load_summarizer()
 
 
-# Functions
+# Creats a temp document from supplied document, breaks up the info
+# into a list of list of strings w/o epmty lines and returns it.
 def extract_text_from_docx(docx_path):
     doc = Document(docx_path)
     full_text = []
@@ -41,6 +51,7 @@ def extract_text_from_docx(docx_path):
     return "\n".join(full_text)
 
 
+# Breaks the document into smaller chunks to be used in the load_summarizer()
 def summarize_text(text, max_chunk_length=1024):
     if not text:
         return "No text to summarize."
@@ -61,7 +72,8 @@ def summarize_text(text, max_chunk_length=1024):
     return "\n\n".join(summaries)
 
 
-#
+# Takes as input the extracted text and a search term, splits the info into
+# paragraphs
 def search_in_text(text, search_term):
     if not search_term or not text:
         return text
@@ -79,7 +91,7 @@ def search_in_text(text, search_term):
     return "\n".join(matching_paragraphs)
 
 
-# UI
+# UI via streamlit
 st.title("🔥📄🚒 SOG Summarizer")
 st.write("Upload a DOCX file to extract and summarize its content.")
 
@@ -102,7 +114,7 @@ if uploaded_file:
     with st.spinner("Extracting text from document..."):
         text = extract_text_from_docx(docx_path)
 
-    # Show text statistics
+    # Show word count
     word_count = len(text.split())
     st.write(f"Document contains approximately {word_count} words.")
 
